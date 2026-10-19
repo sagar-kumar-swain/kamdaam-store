@@ -60,7 +60,7 @@
   document.getElementById('footer').innerHTML = KD.footerHTML();
   KD.updateBadge();
   document.getElementById('catHead').innerHTML =
-    '<img class="cat-banner" src="' + KD.bannerFile(c.banner) + '" alt="' + KD.esc(c.name) + '">' +
+    '<img class="cat-banner" src="banners/banner-' + c.id + '.png" alt="' + KD.esc(c.name) + '">' +
     '<h1 class="page-title">' + KD.esc(c.name) + '</h1>' +
     '<p class="page-sub">' + KD.esc(c.tagline) + '</p>';
   var items = KD.C.products.filter(function (p) { return p.category === c.id; });
