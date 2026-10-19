@@ -109,7 +109,7 @@
       'Quantity: ' + qty + '\n' +
       'Price: ' + money(p.price) + ' x ' + qty + ' = ' + money(total) + '\n\n' +
       'Total: ' + money(total) + ' (COD/UPI)\n\n' +
-      'My name:\nMy address:';
+      buyerBlock();
   }
   function cartOrderText(items, totals) {
     var lines = ['Hello! I want to order from ' + brandName() + ':\n'];
@@ -117,8 +117,86 @@
       lines.push((i + 1) + '. ' + it.p.name + '\n   ' + money(it.p.price) + ' x ' + it.q + ' = ' + money(it.p.price * it.q));
     });
     lines.push('\nTotal: ' + money(totals.total) +
-      ' (You save: ' + money(totals.savings) + ', COD/UPI)\n\nMy name:\nMy address:');
+      ' (You save: ' + money(totals.savings) + ', COD/UPI)\n\n' + buyerBlock());
     return lines.join('\n');
+  }
+
+  /* ---------- device-local account (no server, honest) ---------- */
+  var USER_KEY = 'kamdaam_user_v1';
+  function getUser() {
+    try { return JSON.parse(store.get(USER_KEY) || 'null'); } catch (e) { return null; }
+  }
+  function setUser(u) { store.set(USER_KEY, JSON.stringify(u)); refreshLoginBtn(); }
+  function clearUser() {
+    try { localStorage.removeItem(USER_KEY); } catch (e) { delete store.mem[USER_KEY]; }
+    refreshLoginBtn();
+  }
+  function firstName(u) { return String(u.name || '').trim().split(/\s+/)[0] || 'Friend'; }
+  function buyerBlock() {
+    var u = getUser();
+    if (u) return 'My name: ' + u.name + '\nMy mobile: ' + u.mobile + '\nMy address:';
+    return 'My name:\nMy address:';
+  }
+
+  /* ---------- login / account modal ---------- */
+  function ensureModal() {
+    if (document.getElementById('kd-login-modal')) return;
+    var d = document.createElement('div');
+    d.innerHTML = '<div class="kd-modal" id="kd-login-modal" hidden>' +
+      '<div class="kd-backdrop" data-kd-close></div>' +
+      '<div class="kd-box" role="dialog" aria-modal="true" aria-labelledby="kd-login-title">' +
+      '<div class="kd-head"><span id="kd-login-title">Login / Sign Up</span>' +
+      '<button class="kd-x" type="button" data-kd-close aria-label="Close">\u00D7</button></div>' +
+      '<div class="kd-body" id="kd-body"></div></div></div>';
+    document.body.appendChild(d.firstChild);
+  }
+  function loginFormHTML() {
+    return '<div class="kd-field"><label for="kd-name">Full Name</label>' +
+      '<input id="kd-name" type="text" placeholder="Enter your full name" autocomplete="name" maxlength="60"></div>' +
+      '<div class="kd-field"><label for="kd-mobile">Mobile Number</label>' +
+      '<input id="kd-mobile" type="tel" inputmode="numeric" placeholder="10-digit mobile number" autocomplete="tel" maxlength="10"></div>' +
+      '<div class="kd-err" id="kd-err" role="alert"></div>' +
+      '<button class="kd-continue" id="kd-continue" type="button">Continue</button>' +
+      '<p class="kd-note">Your details stay on this device.</p>';
+  }
+  function accountHTML(u) {
+    return '<div class="kd-account">' +
+      '<div class="kd-avatar">' + esc(firstName(u).charAt(0).toUpperCase()) + '</div>' +
+      '<div class="kd-aname">' + esc(u.name) + '</div>' +
+      '<div class="kd-amobile">+91 ' + esc(u.mobile) + '</div></div>' +
+      '<button class="kd-logout" id="kd-logout" type="button">Logout</button>';
+  }
+  function renderLoginBody() {
+    var body = document.getElementById('kd-body');
+    if (!body) return;
+    var u = getUser();
+    body.innerHTML = u ? accountHTML(u) : loginFormHTML();
+    var cont = document.getElementById('kd-continue');
+    if (cont) cont.addEventListener('click', doLogin);
+    var out = document.getElementById('kd-logout');
+    if (out) out.addEventListener('click', function () { clearUser(); closeLogin(); });
+    if (!u) { var nm = document.getElementById('kd-name'); if (nm) nm.focus(); }
+  }
+  function openLogin() { ensureModal(); renderLoginBody(); document.getElementById('kd-login-modal').hidden = false; }
+  function closeLogin() { var m = document.getElementById('kd-login-modal'); if (m) m.hidden = true; }
+  function doLogin() {
+    var nameEl = document.getElementById('kd-name');
+    var mobEl = document.getElementById('kd-mobile');
+    var err = document.getElementById('kd-err');
+    if (!nameEl || !mobEl || !err) return;
+    var name = nameEl.value.trim();
+    var mobile = mobEl.value.replace(/\D/g, '');
+    if (name.length < 2) { err.textContent = 'Please enter your full name.'; nameEl.focus(); return; }
+    if (!/^[6-9]\d{9}$/.test(mobile)) { err.textContent = 'Please enter a valid 10-digit mobile number.'; mobEl.focus(); return; }
+    err.textContent = '';
+    setUser({ name: name, mobile: mobile });
+    closeLogin();
+  }
+  function refreshLoginBtn() {
+    var b = document.getElementById('login-btn');
+    if (!b) return;
+    var u = getUser();
+    b.textContent = u ? 'Hi, ' + firstName(u) : 'Login';
   }
 
   /* ---------- header/footer shells ---------- */
@@ -130,7 +208,7 @@
       '<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#8A918A" stroke-width="2" stroke-linecap="round"><circle cx="11" cy="11" r="7"/><path d="M21 21l-4.3-4.3"/></svg>' +
       '<input id="search" type="search" placeholder="Search for Products, Brands and More" aria-label="Search products"></div>' +
       '<div class="header-actions">' +
-      '<a class="login-btn" href="#">Login</a>' +
+      '<button class="login-btn" id="login-btn" type="button">Login</button>' +
       '<a class="cart-link" href="cart.html" aria-label="Cart">' +
       '<svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="#FFFFFF" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="9" cy="21" r="1"/><circle cx="20" cy="21" r="1"/><path d="M1 1h4l2.68 13.39a2 2 0 0 0 2 1.61h9.72a2 2 0 0 0 2-1.61L23 6H6"/></svg>' +
       '<span class="lbl">Cart</span>' +
@@ -153,5 +231,16 @@
     waLink: waLink, singleOrderText: singleOrderText, cartOrderText: cartOrderText,
     headerHTML: headerHTML, footerHTML: footerHTML, esc: esc
   };
-  document.addEventListener('DOMContentLoaded', updateBadge);
+  document.addEventListener('DOMContentLoaded', function () {
+    updateBadge();
+    ensureModal();
+    refreshLoginBtn();
+  });
+  document.addEventListener('click', function (e) {
+    if (e.target.closest('#login-btn')) { openLogin(); return; }
+    if (e.target.closest('[data-kd-close]')) { closeLogin(); }
+  });
+  document.addEventListener('keydown', function (e) {
+    if (e.key === 'Escape') closeLogin();
+  });
 })();
