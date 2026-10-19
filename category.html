@@ -6,6 +6,38 @@
 <title id="title">Kamdaam</title>
 <link rel="icon" href="../branding/icon-512.png">
 <link rel="stylesheet" href="css/styles.css">
+<!-- PASTE YOUR META PIXEL ID WHERE INDICATED -->
+<script>
+(function () {
+  var META_PIXEL_ID = 'YOUR_PIXEL_ID'; /* PASTE YOUR META PIXEL ID WHERE INDICATED */
+  if (!META_PIXEL_ID || META_PIXEL_ID === 'YOUR_PIXEL_ID') return; /* inert until you paste your ID */
+  !function (f, b, e, v, n, t, s) {
+    if (f.fbq) return; n = f.fbq = function () {
+      n.callMethod ? n.callMethod.apply(n, arguments) : n.queue.push(arguments);
+    };
+    if (!f._fbq) f._fbq = n; n.push = n; n.loaded = !0; n.version = '2.0'; n.queue = [];
+    t = b.createElement(e); t.async = !0; t.src = v;
+    s = b.getElementsByTagName(e)[0]; s.parentNode.insertBefore(t, s);
+  }(window, document, 'script', 'https://connect.facebook.net/en_US/fbevents.js');
+  fbq('init', META_PIXEL_ID);
+  fbq('track', 'PageView');
+})();
+</script>
+<!-- PASTE YOUR GOOGLE ANALYTICS MEASUREMENT ID WHERE INDICATED -->
+<script>
+(function () {
+  var GA_MEASUREMENT_ID = 'G-XXXXXXXXXX'; /* PASTE YOUR GOOGLE ANALYTICS MEASUREMENT ID WHERE INDICATED */
+  if (!GA_MEASUREMENT_ID || GA_MEASUREMENT_ID === 'G-XXXXXXXXXX') return; /* inert until you paste your ID */
+  var s = document.createElement('script');
+  s.async = true;
+  s.src = 'https://www.googletagmanager.com/gtag/js?id=' + GA_MEASUREMENT_ID;
+  document.head.appendChild(s);
+  window.dataLayer = window.dataLayer || [];
+  window.gtag = function () { dataLayer.push(arguments); };
+  gtag('js', new Date());
+  gtag('config', GA_MEASUREMENT_ID);
+})();
+</script>
 </head>
 <body>
 <div id="header"></div>
@@ -32,7 +64,7 @@
     '<h1 class="page-title">' + KD.esc(c.name) + '</h1>' +
     '<p class="page-sub">' + KD.esc(c.tagline) + '</p>';
   var items = KD.C.products.filter(function (p) { return p.category === c.id; });
-  document.getElementById('grid').innerHTML = items.map(KD.cardHTML).join('');
+  document.getElementById('grid').innerHTML = items.map(function (p, i) { return KD.cardHTML(p, i); }).join('');
 })();
 </script>
 </body>

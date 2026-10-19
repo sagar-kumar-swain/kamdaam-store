@@ -7,6 +7,38 @@
 <meta name="description" content="Kamdaam — Low Prices. Every Day. Fashion, mobile accessories, home & kitchen at the right price.">
 <link rel="icon" href="../branding/icon-512.png">
 <link rel="stylesheet" href="css/styles.css">
+<!-- PASTE YOUR META PIXEL ID WHERE INDICATED -->
+<script>
+(function () {
+  var META_PIXEL_ID = 'YOUR_PIXEL_ID'; /* PASTE YOUR META PIXEL ID WHERE INDICATED */
+  if (!META_PIXEL_ID || META_PIXEL_ID === 'YOUR_PIXEL_ID') return; /* inert until you paste your ID */
+  !function (f, b, e, v, n, t, s) {
+    if (f.fbq) return; n = f.fbq = function () {
+      n.callMethod ? n.callMethod.apply(n, arguments) : n.queue.push(arguments);
+    };
+    if (!f._fbq) f._fbq = n; n.push = n; n.loaded = !0; n.version = '2.0'; n.queue = [];
+    t = b.createElement(e); t.async = !0; t.src = v;
+    s = b.getElementsByTagName(e)[0]; s.parentNode.insertBefore(t, s);
+  }(window, document, 'script', 'https://connect.facebook.net/en_US/fbevents.js');
+  fbq('init', META_PIXEL_ID);
+  fbq('track', 'PageView');
+})();
+</script>
+<!-- PASTE YOUR GOOGLE ANALYTICS MEASUREMENT ID WHERE INDICATED -->
+<script>
+(function () {
+  var GA_MEASUREMENT_ID = 'G-XXXXXXXXXX'; /* PASTE YOUR GOOGLE ANALYTICS MEASUREMENT ID WHERE INDICATED */
+  if (!GA_MEASUREMENT_ID || GA_MEASUREMENT_ID === 'G-XXXXXXXXXX') return; /* inert until you paste your ID */
+  var s = document.createElement('script');
+  s.async = true;
+  s.src = 'https://www.googletagmanager.com/gtag/js?id=' + GA_MEASUREMENT_ID;
+  document.head.appendChild(s);
+  window.dataLayer = window.dataLayer || [];
+  window.gtag = function () { dataLayer.push(arguments); };
+  gtag('js', new Date());
+  gtag('config', GA_MEASUREMENT_ID);
+})();
+</script>
 </head>
 <body>
 <div id="header"></div>
@@ -15,12 +47,38 @@
 <div class="cat-strip"><div class="cat-row" id="catRow"></div></div>
 
 <main class="wrap">
-  <!-- Hero -->
-  <a class="hero" href="#dealSection" aria-label="Mega Sale — Up to 80% Off">
-    <h2>MEGA SALE</h2>
-    <p>Up to 80% Off on Top Brands</p>
-    <span class="hero-cta">SHOP NOW</span>
-  </a>
+  <!-- Hero: Diwali Dhamaka Sale -->
+  <div class="hero" role="region" aria-label="Diwali Dhamaka Sale">
+    <div class="hero-main">
+      <div class="hero-text">
+        <h2><span class="hero-diwali">DIWALI</span><br>DHAMAKA SALE</h2>
+        <p class="hero-sub">Up to 80% Off &#8226; Top Brands</p>
+        <a class="hero-cta" href="#dealSection">SHOP NOW</a>
+      </div>
+      <div class="hero-photo">
+        <span class="hero-ribbon">MIN. 50% OFF</span>
+        <img src="images/prod-19-led-table-lamp.jpg" alt="LED Table Lamp on sale">
+      </div>
+    </div>
+    <img class="deco hero-d1" src="img/diya.png" alt="" aria-hidden="true">
+    <img class="deco hero-d2" src="img/diya.png" alt="" aria-hidden="true">
+    <img class="deco hero-s1" src="img/sparkle.png" alt="" aria-hidden="true">
+    <img class="deco hero-s2" src="img/sparkle.png" alt="" aria-hidden="true">
+    <div class="countdown" aria-label="Sale countdown">
+      <span class="cd-label">SALE ENDS IN</span>
+      <div class="cd-box"><span class="num" id="cdH">00</span><span class="unit">Hrs</span></div>
+      <div class="cd-box"><span class="num" id="cdM">00</span><span class="unit">Min</span></div>
+      <div class="cd-box"><span class="num" id="cdS">00</span><span class="unit">Sec</span></div>
+      <img class="cd-diya" src="img/diya.png" alt="" aria-hidden="true">
+    </div>
+  </div>
+
+  <!-- Coupon slide -->
+  <div class="coupon-strip" role="note" aria-label="Coupon offer">
+    <span>EXTRA 10% OFF* on Prepaid Orders</span>
+    <span class="coupon-code">CODE: KAMDAAM10</span>
+    <img class="sparkle" src="img/sparkle.png" alt="" aria-hidden="true">
+  </div>
 
   <!-- Search results (hidden until typing) -->
   <section class="section" id="searchSection" style="display:none">
@@ -46,7 +104,7 @@
     </div>
   </section>
 
-  <div class="note-strip">Orders are confirmed on WhatsApp — no online payment needed. COD and UPI both available.</div>
+  <div class="note-strip">COD and UPI available. Online payment coming soon.</div>
 </main>
 
 <div id="footer"></div>
@@ -60,20 +118,25 @@
   document.getElementById('footer').innerHTML = KD.footerHTML();
   KD.updateBadge();
 
-  /* Category strip: circles with banner thumbnails from catalog */
+  /* Category strip: festive squircle tiles */
+  var TILE = { fashion: 'img/tile-fashion.png', mobile: 'img/tile-mobile.png', home: 'img/tile-home.png' };
+  var SHORT = { fashion: 'Fashion', mobile: 'Mobiles', home: 'Home' };
   document.getElementById('catRow').innerHTML = C.categories.map(function (c) {
+    var t = TILE[c.id] || KD.bannerFile(c.banner);
+    var label = SHORT[c.id] || c.name;
     return '<a class="cat-item" href="category.html?id=' + c.id + '">' +
-      '<img src="' + KD.bannerFile(c.banner) + '" alt="' + KD.esc(c.name) + '" loading="lazy">' +
-      '<span>' + KD.esc(c.name) + '</span></a>';
+      '<img src="' + t + '" alt="' + KD.esc(label) + '" loading="lazy">' +
+      '<span>' + KD.esc(label) + '</span></a>';
   }).join('');
+  KD.startCountdown();
 
   /* Deals of the Day: discount-sorted */
   var deals = C.products.slice().sort(function (a, b) { return b.discount_pct - a.discount_pct; }).slice(0, 10);
-  document.getElementById('dealGrid').innerHTML = deals.map(KD.cardHTML).join('');
+  document.getElementById('dealGrid').innerHTML = deals.map(function (p, i) { return KD.cardHTML(p, i); }).join('');
 
   /* Bestsellers */
   var best = C.products.filter(function (p) { return p.badge === 'bestseller'; });
-  document.getElementById('bestGrid').innerHTML = best.map(KD.cardHTML).join('');
+  document.getElementById('bestGrid').innerHTML = best.map(function (p, i) { return KD.cardHTML(p, i); }).join('');
 
   /* Search */
   var input = document.getElementById('search');
@@ -88,7 +151,7 @@
     });
     document.getElementById('searchMeta').textContent = res.length + ' results';
     document.getElementById('searchGrid').innerHTML = res.length
-      ? res.map(KD.cardHTML).join('')
+      ? res.map(function (p, i) { return KD.cardHTML(p, i); }).join('')
       : '<div class="empty"><div class="art">🔍</div><h3>No results found</h3><p>Try searching for something else</p></div>';
   });
 })();

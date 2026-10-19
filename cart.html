@@ -6,6 +6,38 @@
 <title>Cart — Kamdaam</title>
 <link rel="icon" href="../branding/icon-512.png">
 <link rel="stylesheet" href="css/styles.css">
+<!-- PASTE YOUR META PIXEL ID WHERE INDICATED -->
+<script>
+(function () {
+  var META_PIXEL_ID = 'YOUR_PIXEL_ID'; /* PASTE YOUR META PIXEL ID WHERE INDICATED */
+  if (!META_PIXEL_ID || META_PIXEL_ID === 'YOUR_PIXEL_ID') return; /* inert until you paste your ID */
+  !function (f, b, e, v, n, t, s) {
+    if (f.fbq) return; n = f.fbq = function () {
+      n.callMethod ? n.callMethod.apply(n, arguments) : n.queue.push(arguments);
+    };
+    if (!f._fbq) f._fbq = n; n.push = n; n.loaded = !0; n.version = '2.0'; n.queue = [];
+    t = b.createElement(e); t.async = !0; t.src = v;
+    s = b.getElementsByTagName(e)[0]; s.parentNode.insertBefore(t, s);
+  }(window, document, 'script', 'https://connect.facebook.net/en_US/fbevents.js');
+  fbq('init', META_PIXEL_ID);
+  fbq('track', 'PageView');
+})();
+</script>
+<!-- PASTE YOUR GOOGLE ANALYTICS MEASUREMENT ID WHERE INDICATED -->
+<script>
+(function () {
+  var GA_MEASUREMENT_ID = 'G-XXXXXXXXXX'; /* PASTE YOUR GOOGLE ANALYTICS MEASUREMENT ID WHERE INDICATED */
+  if (!GA_MEASUREMENT_ID || GA_MEASUREMENT_ID === 'G-XXXXXXXXXX') return; /* inert until you paste your ID */
+  var s = document.createElement('script');
+  s.async = true;
+  s.src = 'https://www.googletagmanager.com/gtag/js?id=' + GA_MEASUREMENT_ID;
+  document.head.appendChild(s);
+  window.dataLayer = window.dataLayer || [];
+  window.gtag = function () { dataLayer.push(arguments); };
+  gtag('js', new Date());
+  gtag('config', GA_MEASUREMENT_ID);
+})();
+</script>
 </head>
 <body>
 <div id="header"></div>
@@ -24,6 +56,10 @@
   document.getElementById('header').innerHTML = KD.headerHTML();
   document.getElementById('footer').innerHTML = KD.footerHTML();
 
+  /* coupon + payment state */
+  var promo = { code: '', applied: false, ok: false, msg: '' };
+  var payMethod = 'cod'; /* 'cod' | 'upi' */
+
   function items() {
     var c = KD.getCart(), out = [];
     Object.keys(c).forEach(function (id) {
@@ -35,7 +71,29 @@
   function totals(list) {
     var sub = 0, mrp = 0;
     list.forEach(function (it) { sub += it.p.price * it.q; mrp += it.p.mrp * it.q; });
-    return { sub: sub, mrp: mrp, savings: mrp - sub, delivery: 0, total: sub };
+    /* KAMDAAM10: exactly 10% off, only when payment is prepaid (UPI) */
+    var coupon = (promo.applied && payMethod === 'upi') ? Math.floor(sub * 0.10) : 0; /* floor — matches Android app exactly */
+    return { sub: sub, mrp: mrp, savings: mrp - sub, coupon: coupon, total: sub - coupon };
+  }
+  function payLabel() {
+    return payMethod === 'upi' ? 'UPI (prepaid)' : 'Cash on Delivery';
+  }
+  function promoHTML() {
+    var msg = '';
+    if (promo.msg) msg = '<div class="' + (promo.ok ? 'promo-ok' : 'promo-err') + '">' + KD.esc(promo.msg) + '</div>';
+    return '<div class="promo"><div class="promo-row">' +
+      '<input id="promoInput" type="text" placeholder="Enter promo code" maxlength="20" value="' + KD.esc(promo.code) + '" aria-label="Promo code">' +
+      '<button class="btn btn-primary" id="promoApply" type="button">Apply</button></div>' +
+      msg +
+      '<div class="promo-note">*KAMDAAM10 gives 10% off on prepaid (UPI) orders.</div></div>';
+  }
+  function payHTML() {
+    return '<div class="pay-methods" role="radiogroup" aria-label="Payment method">' +
+      '<div class="pm-title">Payment Method</div>' +
+      '<label class="pm-option"><input type="radio" name="pay" value="cod"' + (payMethod === 'cod' ? ' checked' : '') + '> Cash on Delivery <span class="pm-sub">Pay when you receive</span></label>' +
+      '<label class="pm-option"><input type="radio" name="pay" value="upi"' + (payMethod === 'upi' ? ' checked' : '') + '> UPI <span class="pm-sub">Prepaid — pay now</span></label>' +
+      '<label class="pm-option disabled"><input type="radio" name="pay" value="online" disabled> Online Payment <span class="soon-badge">Coming Soon</span></label>' +
+      '</div>';
   }
   function render() {
     var list = items(), box = document.getElementById('cartBody');
@@ -46,6 +104,9 @@
       return;
     }
     var t = totals(list);
+    var couponRow = t.coupon
+      ? '<div class="tr"><span>Coupon (KAMDAAM10)</span><span style="color:var(--offer-green)">− ' + KD.money(t.coupon) + '</span></div>'
+      : '';
     box.innerHTML =
       '<div class="cart-list">' + list.map(function (it) {
         return '<div class="cart-row"><img src="' + KD.imgFile(it.p) + '" alt="' + KD.esc(it.p.name) + '">' +
@@ -55,20 +116,40 @@
           '<span class="lt">' + KD.money(it.p.price * it.q) + '</span></div>' +
           '<button class="rm" data-remove="' + it.p.id + '">Remove</button></div></div>';
       }).join('') + '</div>' +
+      promoHTML() + payHTML() +
       '<div class="totals">' +
       '<div class="tr"><span>Total MRP</span><span>' + KD.money(t.mrp) + '</span></div>' +
       '<div class="tr"><span>Discount</span><span style="color:var(--offer-green)">− ' + KD.money(t.savings) + '</span></div>' +
+      couponRow +
       '<div class="tr"><span>Delivery</span><span style="color:var(--offer-green)">FREE</span></div>' +
       '<div class="tr grand"><span>Total</span><span>' + KD.money(t.total) + '</span></div>' +
-      '<div class="save-line">You save: ' + KD.money(t.savings) + '</div></div>' +
+      '<div class="save-line">You save: ' + KD.money(t.savings + t.coupon) + '</div></div>' +
       '<a class="btn btn-wa btn-block" id="checkoutWa" target="_blank" rel="noopener" style="margin-bottom:24px">' +
       'Order on WhatsApp (' + KD.money(t.total) + ')</a>';
 
-    document.getElementById('checkoutWa').href = KD.waLink(KD.cartOrderText(list, t));
+    document.getElementById('checkoutWa').href = KD.waLink(KD.cartOrderText(list, t, payLabel()));
     box.querySelectorAll('[data-remove]').forEach(function (b) {
       b.addEventListener('click', function () {
         var c = KD.getCart(); delete c[b.getAttribute('data-remove')]; KD.setCart(c); render();
       });
+    });
+    var applyBtn = document.getElementById('promoApply');
+    if (applyBtn) applyBtn.addEventListener('click', function () {
+      var v = document.getElementById('promoInput').value.trim().toUpperCase();
+      promo.code = v;
+      if (v === 'KAMDAAM10') {
+        promo.applied = true; promo.ok = true;
+        promo.msg = payMethod === 'upi'
+          ? 'Code applied: 10% off on your prepaid (UPI) order.'
+          : 'Code applied: 10% off — select UPI (prepaid) below to get it.';
+      } else {
+        promo.applied = false; promo.ok = false;
+        promo.msg = 'Invalid promo code. Please check and try again.';
+      }
+      render();
+    });
+    box.querySelectorAll('input[name="pay"]').forEach(function (r) {
+      r.addEventListener('change', function () { payMethod = r.value; render(); });
     });
   }
   window.onCartChange = render;
