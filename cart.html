@@ -95,6 +95,87 @@
       '<label class="pm-option disabled"><input type="radio" name="pay" value="online" disabled> Online Payment <span class="soon-badge">Coming Soon</span></label>' +
       '</div>';
   }
+  /* v2.5: in-app address form — no WhatsApp needed for COD orders */
+  function addrHTML() {
+    return '<div class="addr-form"><div class="pm-title">Delivery Details</div>' +
+      '<input id="adName" class="addr-in" placeholder="Full Name *" maxlength="60" autocomplete="name">' +
+      '<input id="adPhone" class="addr-in" placeholder="Mobile Number * (10 digits)" maxlength="10" inputmode="numeric" autocomplete="tel">' +
+      '<input id="adAddr" class="addr-in" placeholder="Street Address * (house no, street, area)" maxlength="120" autocomplete="street-address">' +
+      '<div class="addr-row"><input id="adCity" class="addr-in" placeholder="City *" maxlength="40">' +
+      '<input id="adPin" class="addr-in" placeholder="Pincode * (6 digits)" maxlength="6" inputmode="numeric"></div>' +
+      '<input id="adState" class="addr-in" placeholder="State *" maxlength="40">' +
+      '<div id="addrErr" class="promo-err" style="display:none"></div></div>';
+  }
+  function readAddr() {
+    return {
+      name: document.getElementById('adName').value.trim(),
+      phone: document.getElementById('adPhone').value.replace(/\D/g, '').slice(-10),
+      address: document.getElementById('adAddr').value.trim(),
+      city: document.getElementById('adCity').value.trim(),
+      state: document.getElementById('adState').value.trim(),
+      pin: document.getElementById('adPin').value.replace(/\D/g, '')
+    };
+  }
+  function validateAddr(a) {
+    if (!a.name) return 'Please enter your full name';
+    if (!/^\d{10}$/.test(a.phone)) return 'Please enter a valid 10-digit mobile number';
+    if (!a.address) return 'Please enter your street address';
+    if (!a.city) return 'Please enter your city';
+    if (!a.state) return 'Please enter your state';
+    if (!/^\d{6}$/.test(a.pin)) return 'Please enter a valid 6-digit pincode';
+    if (/[\u0900-\u097F]/.test(a.name + ' ' + a.address + ' ' + a.city + ' ' + a.state))
+      return 'Please write the address in English';
+    return null;
+  }
+  function showAddrErr(msg) {
+    var e = document.getElementById('addrErr');
+    e.textContent = msg; e.style.display = msg ? '' : 'none';
+  }
+  /* v2.5: automatic dispatch to the fulfillment worker (COD only) */
+  var WORKER_URL = 'https://kamdaam-fulfill.dipurajwansi2.workers.dev';
+  var WORKER_KEY = 'cf197de3d83f2670fc9af7199ee82398f3646f96566faa3b';
+  var lastOrder = null; /* snapshot for retry */
+  function placeAutoOrder() {
+    var a = readAddr();
+    var err = validateAddr(a);
+    showAddrErr(err || '');
+    if (err) return;
+    var list = items();
+    if (!list.length) { showAddrErr('Your cart is empty'); return; }
+    var t = totals(list);
+    var btn = document.getElementById('placeAuto');
+    btn.disabled = true; btn.textContent = 'Placing Order...';
+    var orderId = 'KD' + Date.now();
+    var payload = {
+      order_id: orderId,
+      items: list.map(function (it) { return { sku: it.p.id, qty: it.q, price: it.p.price }; }),
+      customer: { first_name: a.name, address1: a.address, phone: a.phone, city: a.city, zip: a.pin, province: a.state },
+      payment_method: 'cod',
+      total: t.total
+    };
+    lastOrder = { payload: payload, total: t.total };
+    fetch(WORKER_URL + '/order', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json', 'X-Kamdaam-Key': WORKER_KEY },
+      body: JSON.stringify(payload)
+    }).then(function (r) { return r.json().then(function (j) { return { code: r.status, body: j }; }); })
+    .then(function (res) {
+      if (res.code >= 200 && res.code < 300 && res.body.ok) {
+        KD.setCart({});
+        document.getElementById('cartBody').innerHTML =
+          '<div class="empty"><div class="art">✅</div><h3>Order Placed!</h3>' +
+          '<p>Order ID: ' + KD.esc(orderId) + '<br>Your order is on its way to our printing partner.</p>' +
+          '<a class="btn btn-primary" href="index.html">Continue Shopping</a></div>';
+      } else {
+        var e = (res.body && res.body.error) || 'network error';
+        showAddrErr('Automatic dispatch failed (' + e + '). Your cart is saved — try again or use WhatsApp below.');
+        btn.disabled = false; btn.textContent = 'Try Again';
+      }
+    }).catch(function () {
+      showAddrErr('Network error. Check your connection and try again, or use WhatsApp below.');
+      btn.disabled = false; btn.textContent = 'Try Again';
+    });
+  }
   function render() {
     var list = items(), box = document.getElementById('cartBody');
     if (!list.length) {
@@ -124,10 +205,17 @@
       '<div class="tr"><span>Delivery</span><span style="color:var(--offer-green)">FREE</span></div>' +
       '<div class="tr grand"><span>Total</span><span>' + KD.money(t.total) + '</span></div>' +
       '<div class="save-line">You save: ' + KD.money(t.savings + t.coupon) + '</div></div>' +
-      '<a class="btn btn-wa btn-block" id="checkoutWa" target="_blank" rel="noopener" style="margin-bottom:24px">' +
-      'Order on WhatsApp (' + KD.money(t.total) + ')</a>';
+      addrHTML() +
+      (payMethod === 'cod'
+        ? '<button class="btn btn-primary btn-block" id="placeAuto" type="button" style="margin-bottom:12px">Place Order (' + KD.money(t.total) + ')</button>' +
+          '<a class="btn btn-wa btn-block" id="checkoutWa" target="_blank" rel="noopener" style="margin-bottom:24px">Or Order on WhatsApp</a>' +
+          '<p class="promo-note" style="text-align:center">No WhatsApp needed — your order goes straight to our printing partner.</p>'
+        : '<a class="btn btn-wa btn-block" id="checkoutWa" target="_blank" rel="noopener" style="margin-bottom:24px">' +
+          'Order on WhatsApp (' + KD.money(t.total) + ')</a>');
 
     document.getElementById('checkoutWa').href = KD.waLink(KD.cartOrderText(list, t, payLabel()));
+    var autoBtn = document.getElementById('placeAuto');
+    if (autoBtn) autoBtn.addEventListener('click', placeAutoOrder);
     box.querySelectorAll('[data-remove]').forEach(function (b) {
       b.addEventListener('click', function () {
         var c = KD.getCart(); delete c[b.getAttribute('data-remove')]; KD.setCart(c); render();
