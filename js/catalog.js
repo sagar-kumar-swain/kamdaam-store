@@ -14,21 +14,21 @@ window.CATALOG = {
       "name": "Kamdaam Originals",
       "name_en": "Kamdaam Originals",
       "tagline": "Custom tees & mugs — our own brand, made for you",
-      "banner": "tiles/tile-originals.png"
+      "banner": "img/tile-originals.png"
     },
     {
       "id": "fashion",
       "name": "Fashion",
       "name_en": "Fashion",
       "tagline": "Sarees & kurtis — festive style for everyone",
-      "banner": "tiles/tile-fashion.png"
+      "banner": "img/tile-fashion.png"
     },
     {
       "id": "home-kitchen",
       "name": "Home & Kitchen",
       "name_en": "Home & Kitchen",
       "tagline": "Kitchen essentials — at the right price",
-      "banner": "tiles/tile-home.png"
+      "banner": "img/tile-home.png"
     }
   ],
   "meta": {
