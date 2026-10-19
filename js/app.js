@@ -285,6 +285,7 @@
       '<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#8A918A" stroke-width="2" stroke-linecap="round"><circle cx="11" cy="11" r="7"/><path d="M21 21l-4.3-4.3"/></svg>' +
       '<input id="search" type="search" placeholder="Search for Products, Brands and More" aria-label="Search products"></div>' +
       '<div class="header-actions">' +
+      '<a class="app-btn" href="https://github.com/sagar-kumar-swain/kamdaam-store/releases/download/v2.4/Kamdaam-v2.4-FINAL.apk" aria-label="Download Kamdaam app">📱 Get App</a>' +
       '<button class="login-btn" id="login-btn" type="button">Login</button>' +
       '<a class="cart-link" href="cart.html" aria-label="Cart">' +
       '<svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="#FFFFFF" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="9" cy="21" r="1"/><circle cx="20" cy="21" r="1"/><path d="M1 1h4l2.68 13.39a2 2 0 0 0 2 1.61h9.72a2 2 0 0 0 2-1.61L23 6H6"/></svg>' +
