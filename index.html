@@ -47,17 +47,17 @@
 <div class="cat-strip"><div class="cat-row" id="catRow"></div></div>
 
 <main class="wrap">
-  <!-- Hero: Diwali Dhamaka Sale -->
-  <div class="hero" role="region" aria-label="Diwali Dhamaka Sale">
+  <!-- Hero: seasonal sale (auto-themed by seasons.json) -->
+  <div class="hero" id="heroBox" role="region" aria-label="Season sale">
     <div class="hero-main">
       <div class="hero-text">
-        <h2><span class="hero-diwali">DIWALI</span><br>DHAMAKA SALE</h2>
-        <p class="hero-sub">Up to 80% Off &#8226; Top Brands</p>
+        <h2><span class="hero-diwali" id="heroT1">DIWALI</span><br><span id="heroT2">FASHION SALE</span></h2>
+        <p class="hero-sub" id="heroSub">Up to 80% Off &#8226; Top Brands</p>
         <a class="hero-cta" href="#dealSection">SHOP NOW</a>
       </div>
       <div class="hero-photo">
-        <span class="hero-ribbon">MIN. 50% OFF</span>
-        <img src="images/prod-19-led-table-lamp.jpg" alt="LED Table Lamp on sale">
+        <span class="hero-ribbon" id="heroRibbon">MIN. 50% OFF</span>
+        <img id="heroPhoto" src="images/hero-fashion.png" alt="Sale">
       </div>
     </div>
     <img class="deco hero-d1" src="img/diya.png" alt="" aria-hidden="true">
@@ -119,11 +119,9 @@
   KD.updateBadge();
 
   /* Category strip: festive squircle tiles */
-  var TILE = { fashion: 'img/tile-fashion.png', mobile: 'img/tile-mobile.png',
-    electronics: 'img/tile-electronics.png', home: 'img/tile-home.png',
-    appliances: 'img/tile-appliances.png', grocery: 'img/tile-grocery.png' };
-  var SHORT = { fashion: 'Fashion', mobile: 'Mobiles', electronics: 'Electronics',
-    home: 'Home', appliances: 'Appliances', grocery: 'Grocery' };
+  var TILE = { originals: 'img/tile-originals.png', fashion: 'img/tile-fashion.png',
+    'home-kitchen': 'img/tile-home.png' };
+  var SHORT = { originals: 'Originals', fashion: 'Fashion', 'home-kitchen': 'Home & Kitchen' };
   document.getElementById('catRow').innerHTML = C.categories.map(function (c) {
     var t = TILE[c.id] || KD.bannerFile(c.banner);
     var label = SHORT[c.id] || c.name;
@@ -131,6 +129,7 @@
       '<img src="' + t + '" alt="' + KD.esc(label) + '" loading="lazy">' +
       '<span>' + KD.esc(label) + '</span></a>';
   }).join('');
+  KD.applySeason(); /* v2.4: seasonal auto-theme (banner/gradient/decor/countdown) */
   KD.startCountdown();
 
   /* Deals of the Day: discount-sorted */
