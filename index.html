@@ -119,8 +119,11 @@
   KD.updateBadge();
 
   /* Category strip: festive squircle tiles */
-  var TILE = { fashion: 'img/tile-fashion.png', mobile: 'img/tile-mobile.png', home: 'img/tile-home.png' };
-  var SHORT = { fashion: 'Fashion', mobile: 'Mobiles', home: 'Home' };
+  var TILE = { fashion: 'img/tile-fashion.png', mobile: 'img/tile-mobile.png',
+    electronics: 'img/tile-electronics.png', home: 'img/tile-home.png',
+    appliances: 'img/tile-appliances.png', grocery: 'img/tile-grocery.png' };
+  var SHORT = { fashion: 'Fashion', mobile: 'Mobiles', electronics: 'Electronics',
+    home: 'Home', appliances: 'Appliances', grocery: 'Grocery' };
   document.getElementById('catRow').innerHTML = C.categories.map(function (c) {
     var t = TILE[c.id] || KD.bannerFile(c.banner);
     var label = SHORT[c.id] || c.name;

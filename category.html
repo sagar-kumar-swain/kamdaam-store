@@ -64,7 +64,20 @@
     '<h1 class="page-title">' + KD.esc(c.name) + '</h1>' +
     '<p class="page-sub">' + KD.esc(c.tagline) + '</p>';
   var items = KD.C.products.filter(function (p) { return p.category === c.id; });
-  document.getElementById('grid').innerHTML = items.map(function (p, i) { return KD.cardHTML(p, i); }).join('');
+  if (items.length === 0) {
+    /* v2.3 festive Coming Soon for empty categories (Electronics, Appliances, Grocery) */
+    document.getElementById('grid').innerHTML =
+      '<div class="coming-soon">' +
+      '<img src="img/diya.png" alt="Diya">' +
+      '<h2>Coming Soon</h2>' +
+      '<div class="cs-cat">' + KD.esc(c.name) + '</div>' +
+      '<p class="cs-hinglish">Jald Aa Raha Hai!</p>' +
+      '<p class="cs-sub">We are stocking up the best products for you.</p>' +
+      '<a class="cs-btn" href="index.html">Back to Home</a>' +
+      '</div>';
+  } else {
+    document.getElementById('grid').innerHTML = items.map(function (p, i) { return KD.cardHTML(p, i); }).join('');
+  }
 })();
 </script>
 </body>
