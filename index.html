@@ -6,7 +6,7 @@
 <title>Kamdaam — Low Prices. Every Day.</title>
 <meta name="description" content="Kamdaam — Low Prices. Every Day. Fashion, mobile accessories, home & kitchen at the right price.">
 <link rel="icon" href="../branding/icon-512.png">
-<link rel="stylesheet" href="css/styles.css">
+<link rel="stylesheet" href="css/styles.css?v=2.5">
 <!-- PASTE YOUR META PIXEL ID WHERE INDICATED -->
 <script>
 (function () {
@@ -109,8 +109,8 @@
 
 <div id="footer"></div>
 
-<script src="js/catalog.js"></script>
-<script src="js/app.js"></script>
+<script src="js/catalog.js?v=2.5"></script>
+<script src="js/app.js?v=2.5"></script>
 <script>
 (function () {
   var KD = window.KD, C = KD.C;
@@ -119,8 +119,8 @@
   KD.updateBadge();
 
   /* Category strip: festive squircle tiles */
-  var TILE = { originals: 'img/tile-originals.png', fashion: 'img/tile-fashion.png',
-    'home-kitchen': 'img/tile-home.png' };
+  var TILE = { originals: 'img/tile-originals.png?v=2.5', fashion: 'img/tile-fashion.png?v=2.5',
+    'home-kitchen': 'img/tile-home.png?v=2.5' };
   var SHORT = { originals: 'Originals', fashion: 'Fashion', 'home-kitchen': 'Home & Kitchen' };
   document.getElementById('catRow').innerHTML = C.categories.map(function (c) {
     var t = TILE[c.id] || KD.bannerFile(c.banner);
