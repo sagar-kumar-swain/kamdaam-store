@@ -14,7 +14,7 @@
 
   function money(n) { return '\u20B9' + Number(n).toLocaleString('en-IN'); }
   function imgFile(p) { return p.image; } /* v2.4: images are PNG now; use path as-is */
-  function bannerFile(b) { return 'banners/' + b.split('/').pop().replace(/\.png$/, '.jpg'); }
+  function bannerFile(b) { var p = String(b).split('?')[0]; return 'banners/' + p.split('/').pop(); }
   function waNum() { return (C.seller.whatsapp || '').replace(/\D/g, ''); }
   function brandName() { return C.brand.name; }
 
@@ -74,7 +74,7 @@
     var pi = (typeof i === 'number') ? (i % 6) : 0;
     return '<div class="card pastel-' + pi + '" data-card="' + p.id + '">' +
       '<a class="card-img" href="product.html?id=' + p.id + '" aria-label="' + esc(p.name) + '">' +
-      '<img src="' + imgFile(p) + '" alt="' + esc(p.name) + '" loading="lazy">' + badgesHTML(p) + '</a>' +
+      '<img src="' + imgFile(p) + '" alt="' + esc(p.name) + '">' + badgesHTML(p) + '</a>' +
       '<div class="card-body"><div class="card-name">' + esc(p.name) + '</div>' +
       ratingHTML(p) + priceHTML(p) +
       '<div class="card-cta">' + ctaHTML(p) + '</div></div></div>';
@@ -176,21 +176,22 @@
     var h = document.getElementById('cdH'),
         m = document.getElementById('cdM'),
         s = document.getElementById('cdS'),
-        hu = document.getElementById('cdHu');
+        hu = document.getElementById('cdHu'),
+        dBox = document.getElementById('cdDBox'),
+        dNum = document.getElementById('cdD');
     if (!h || !m || !s) return;
     function pad(n) { return (n < 10 ? '0' : '') + n; }
     function tick() {
       var now = new Date();
       var end = SEASON_END || (function () { var e = new Date(now); e.setHours(24, 0, 0, 0); return e; })();
       var d = Math.max(0, Math.floor((end - now) / 1000));
-      var hrs = Math.floor(d / 3600);
-      if (hrs >= 48) { /* long sale: show days, not "654 Hrs" */
-        h.textContent = Math.floor(hrs / 24);
-        if (hu) hu.textContent = 'Days';
-      } else {
-        h.textContent = pad(hrs);
-        if (hu) hu.textContent = 'Hrs';
-      }
+      var days = Math.floor(d / 86400);
+      if (days > 0) {
+        if (dBox) dBox.style.display = '';
+        if (dNum) dNum.textContent = days;
+      } else if (dBox) dBox.style.display = 'none';
+      h.textContent = pad(Math.floor((d % 86400) / 3600));
+      if (hu) hu.textContent = 'Hrs';
       m.textContent = pad(Math.floor((d % 3600) / 60));
       s.textContent = pad(d % 60);
     }
@@ -285,7 +286,7 @@
       '<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#8A918A" stroke-width="2" stroke-linecap="round"><circle cx="11" cy="11" r="7"/><path d="M21 21l-4.3-4.3"/></svg>' +
       '<input id="search" type="search" placeholder="Search for Products, Brands and More" aria-label="Search products"></div>' +
       '<div class="header-actions">' +
-      '<a class="app-btn" href="https://github.com/sagar-kumar-swain/kamdaam-store/releases/download/v2.5/Kamdaam-v2.5-FINAL.apk" aria-label="Download Kamdaam app">📱 Get App</a>' +
+      '<a class="app-btn" href="https://github.com/sagar-kumar-swain/kamdaam-store/releases/download/v2.6/Kamdaam-v2.6-FINAL.apk" aria-label="Download Kamdaam app">📱 Get App</a>' +
       '<button class="login-btn" id="login-btn" type="button">Login</button>' +
       '<a class="cart-link" href="cart.html" aria-label="Cart">' +
       '<svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="#FFFFFF" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="9" cy="21" r="1"/><circle cx="20" cy="21" r="1"/><path d="M1 1h4l2.68 13.39a2 2 0 0 0 2 1.61h9.72a2 2 0 0 0 2-1.61L23 6H6"/></svg>' +
@@ -297,7 +298,7 @@
       '<div class="brand">Kamdaam</div>' +
       '<p>Low Prices. Every Day. — Quality products at the right price. Orders are confirmed on WhatsApp.</p>' +
       '<div class="pay"><span>COD Available</span><span>UPI Available</span></div>' +
-      '<p>Contact: support@example.com</p>' + /* PLACEHOLDER — replace with real support email */
+      '<p>Contact us on <a href="' + waLink('Hello Kamdaam! I need help with my order.') + '" target="_blank" rel="noopener" style="color:#fff;font-weight:700">WhatsApp</a></p>' +
       '</div></footer>';
   }
 
