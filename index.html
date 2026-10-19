@@ -1,0 +1,97 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Kamdaam — Low Prices. Every Day.</title>
+<meta name="description" content="Kamdaam — Low Prices. Every Day. Fashion, mobile accessories, home & kitchen at the right price.">
+<link rel="icon" href="../branding/icon-512.png">
+<link rel="stylesheet" href="css/styles.css">
+</head>
+<body>
+<div id="header"></div>
+
+<!-- Category strip -->
+<div class="cat-strip"><div class="cat-row" id="catRow"></div></div>
+
+<main class="wrap">
+  <!-- Hero -->
+  <a class="hero" href="#dealSection" aria-label="Mega Sale — Up to 80% Off">
+    <h2>MEGA SALE</h2>
+    <p>Up to 80% Off on Top Brands</p>
+    <span class="hero-cta">SHOP NOW</span>
+  </a>
+
+  <!-- Search results (hidden until typing) -->
+  <section class="section" id="searchSection" style="display:none">
+    <div class="section-card">
+      <div class="section-head"><h2>Search Results</h2><span class="see-all" id="searchMeta"></span></div>
+      <div class="grid" id="searchGrid"></div>
+    </div>
+  </section>
+
+  <!-- Deals of the Day -->
+  <section class="section" id="dealSection">
+    <div class="section-card">
+      <div class="section-head"><h2>Deals of the Day</h2><a class="chev" href="#" aria-label="View all deals">›</a></div>
+      <div class="grid" id="dealGrid"></div>
+    </div>
+  </section>
+
+  <!-- Bestsellers -->
+  <section class="section">
+    <div class="section-card">
+      <div class="section-head"><h2>Bestsellers</h2><a class="chev" href="#" aria-label="View all bestsellers">›</a></div>
+      <div class="grid" id="bestGrid"></div>
+    </div>
+  </section>
+
+  <div class="note-strip">Orders are confirmed on WhatsApp — no online payment needed. COD and UPI both available.</div>
+</main>
+
+<div id="footer"></div>
+
+<script src="js/catalog.js"></script>
+<script src="js/app.js"></script>
+<script>
+(function () {
+  var KD = window.KD, C = KD.C;
+  document.getElementById('header').innerHTML = KD.headerHTML();
+  document.getElementById('footer').innerHTML = KD.footerHTML();
+  KD.updateBadge();
+
+  /* Category strip: circles with banner thumbnails from catalog */
+  document.getElementById('catRow').innerHTML = C.categories.map(function (c) {
+    return '<a class="cat-item" href="category.html?id=' + c.id + '">' +
+      '<img src="' + KD.bannerFile(c.banner) + '" alt="' + KD.esc(c.name) + '" loading="lazy">' +
+      '<span>' + KD.esc(c.name) + '</span></a>';
+  }).join('');
+
+  /* Deals of the Day: discount-sorted */
+  var deals = C.products.slice().sort(function (a, b) { return b.discount_pct - a.discount_pct; }).slice(0, 10);
+  document.getElementById('dealGrid').innerHTML = deals.map(KD.cardHTML).join('');
+
+  /* Bestsellers */
+  var best = C.products.filter(function (p) { return p.badge === 'bestseller'; });
+  document.getElementById('bestGrid').innerHTML = best.map(KD.cardHTML).join('');
+
+  /* Search */
+  var input = document.getElementById('search');
+  input.addEventListener('input', function () {
+    var q = input.value.trim().toLowerCase();
+    var show = q.length > 0;
+    document.getElementById('searchSection').style.display = show ? '' : 'none';
+    document.getElementById('dealSection').style.display = show ? 'none' : '';
+    if (!show) return;
+    var res = C.products.filter(function (p) {
+      return (p.name + ' ' + p.name_en + ' ' + p.description).toLowerCase().indexOf(q) > -1;
+    });
+    document.getElementById('searchMeta').textContent = res.length + ' results';
+    document.getElementById('searchGrid').innerHTML = res.length
+      ? res.map(KD.cardHTML).join('')
+      : '<div class="empty"><div class="art">🔍</div><h3>No results found</h3><p>Try searching for something else</p></div>';
+  });
+})();
+</script>
+</body>
+</html>
