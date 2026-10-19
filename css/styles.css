@@ -180,6 +180,10 @@ button{font:inherit;cursor:pointer;border:none;background:none}
 .pdp-img{background:var(--paper);border:1px solid var(--line);border-radius:var(--r-card);
   overflow:hidden;box-shadow:var(--shadow-card);position:relative;padding:24px}
 .pdp-img img{width:100%;aspect-ratio:1/1;object-fit:contain}
+.pdp-thumbs{display:flex;gap:10px;margin-top:12px;overflow-x:auto;padding-bottom:4px}
+.pdp-thumb{width:64px;height:64px;object-fit:cover;border-radius:8px;cursor:pointer;
+  border:2px solid var(--line);background:#fff;flex-shrink:0}
+.pdp-thumb.sel{border-color:var(--blue-600)}
 .pdp-info h1{font-size:22px;font-weight:700;line-height:1.36}
 .pdp-price{margin-top:12px}
 .pdp-price .price{font-size:24px}
