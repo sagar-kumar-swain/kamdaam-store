@@ -14,21 +14,21 @@ window.CATALOG = {
       "name": "Kamdaam Originals",
       "name_en": "Kamdaam Originals",
       "tagline": "Custom tees & mugs — our own brand, made for you",
-      "banner": "img/tile-originals.png?v=2.5"
+      "banner": "banners/banner-originals.png?v=2.5"
     },
     {
       "id": "fashion",
       "name": "Fashion",
       "name_en": "Fashion",
       "tagline": "Sarees & kurtis — festive style for everyone",
-      "banner": "img/tile-fashion.png?v=2.5"
+      "banner": "banners/banner-fashion.png?v=2.5"
     },
     {
       "id": "home-kitchen",
       "name": "Home & Kitchen",
       "name_en": "Home & Kitchen",
       "tagline": "Kitchen essentials — at the right price",
-      "banner": "img/tile-home.png?v=2.5"
+      "banner": "banners/banner-home-kitchen.png?v=2.5"
     }
   ],
   "meta": {
@@ -61,6 +61,7 @@ window.CATALOG = {
       "stock": 200,
       "category": "originals",
       "image": "images/prod-orig-tshirt.png",
+      "gallery": ["images/prod-orig-tshirt.png","images/prod-orig-tshirt-2.png","images/prod-orig-tshirt-3.png"],
       "badge": "originals"
     },
     {
@@ -81,6 +82,7 @@ window.CATALOG = {
       "stock": 300,
       "category": "originals",
       "image": "images/prod-orig-mug.png",
+      "gallery": ["images/prod-orig-mug.png","images/prod-orig-mug-2.png","images/prod-orig-mug-3.png"],
       "badge": "originals"
     },
     {
@@ -101,6 +103,7 @@ window.CATALOG = {
       "stock": 150,
       "category": "fashion",
       "image": "images/prod-fash-saree.png",
+      "gallery": ["images/prod-fash-saree.png","images/prod-fash-saree-2.png","images/prod-fash-saree-3.png"],
       "badge": "bestseller"
     },
     {
@@ -121,6 +124,7 @@ window.CATALOG = {
       "stock": 180,
       "category": "fashion",
       "image": "images/prod-fash-kurti.png",
+      "gallery": ["images/prod-fash-kurti.png","images/prod-fash-kurti-2.png","images/prod-fash-kurti-3.png"],
       "badge": ""
     },
     {
@@ -141,6 +145,7 @@ window.CATALOG = {
       "stock": 220,
       "category": "home-kitchen",
       "image": "images/prod-home-masala.png",
+      "gallery": ["images/prod-home-masala.png","images/prod-home-masala-2.png","images/prod-home-masala-3.png"],
       "badge": ""
     },
     {
@@ -161,6 +166,7 @@ window.CATALOG = {
       "stock": 200,
       "category": "home-kitchen",
       "image": "images/prod-home-jars.png",
+      "gallery": ["images/prod-home-jars.png","images/prod-home-jars-2.png","images/prod-home-jars-3.png"],
       "badge": ""
     }
   ],
