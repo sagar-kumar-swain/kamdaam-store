@@ -5,7 +5,7 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title id="title">Kamdaam</title>
 <link rel="icon" href="../branding/icon-512.png">
-<link rel="stylesheet" href="css/styles.css">
+<link rel="stylesheet" href="css/styles.css?v=2.5">
 <!-- PASTE YOUR META PIXEL ID WHERE INDICATED -->
 <script>
 (function () {
@@ -55,8 +55,8 @@
 </main>
 <div id="footer"></div>
 
-<script src="js/catalog.js"></script>
-<script src="js/app.js"></script>
+<script src="js/catalog.js?v=2.5"></script>
+<script src="js/app.js?v=2.5"></script>
 <script>
 (function () {
   var KD = window.KD;
@@ -73,8 +73,16 @@
     : '<span>Only ' + p.stock + ' left</span>';
   var badge = p.badge === 'bestseller' ? '<span class="badge best">BESTSELLER</span>' : '';
 
+  /* Gallery: Flipkart-style multi-view with thumbnails */
+  var gal = (p.gallery && p.gallery.length) ? p.gallery : [p.image];
+  var thumbs = gal.map(function (g, i) {
+    return '<img class="pdp-thumb' + (i === 0 ? ' sel' : '') + '" data-gi="' + i +
+      '" src="' + g + '" alt="View ' + (i + 1) + '" loading="lazy">';
+  }).join('');
+
   document.getElementById('pdp').innerHTML =
-    '<div class="pdp-img"><img src="' + KD.imgFile(p) + '" alt="' + KD.esc(p.name) + '">' + badge + '</div>' +
+    '<div class="pdp-img"><img id="pdpMain" src="' + gal[0] + '" alt="' + KD.esc(p.name) + '">' + badge +
+    (gal.length > 1 ? '<div class="pdp-thumbs">' + thumbs + '</div>' : '') + '</div>' +
     '<div class="pdp-info"><h1>' + KD.esc(p.name) + '</h1>' +
     KD.ratingHTML(p) +
     '<div class="pdp-price">' + KD.priceHTML(p) + '</div>' +
@@ -97,6 +105,16 @@
   }
   refreshWa();
   window.onCartChange = refreshWa;
+
+  /* Gallery thumbnail switching */
+  var pdpMain = document.getElementById('pdpMain');
+  Array.prototype.forEach.call(document.querySelectorAll('.pdp-thumb'), function (t) {
+    t.addEventListener('click', function () {
+      pdpMain.src = gal[parseInt(t.getAttribute('data-gi'), 10)];
+      Array.prototype.forEach.call(document.querySelectorAll('.pdp-thumb'), function (x) { x.classList.remove('sel'); });
+      t.classList.add('sel');
+    });
+  });
 
   /* Related products: same category, pastel-rotated cards */
   var rel = KD.C.products.filter(function (x) { return x.category === p.category && x.id !== p.id; }).slice(0, 5);
