@@ -66,6 +66,7 @@
     <img class="deco hero-s2" src="img/sparkle.png" alt="" aria-hidden="true">
     <div class="countdown" aria-label="Sale countdown">
       <span class="cd-label">SALE ENDS IN</span>
+      <div class="cd-box" id="cdDBox" style="display:none"><span class="num" id="cdD">00</span><span class="unit">Days</span></div>
       <div class="cd-box"><span class="num" id="cdH">00</span><span class="unit" id="cdHu">Hrs</span></div>
       <div class="cd-box"><span class="num" id="cdM">00</span><span class="unit">Min</span></div>
       <div class="cd-box"><span class="num" id="cdS">00</span><span class="unit">Sec</span></div>
@@ -136,8 +137,12 @@
   var deals = C.products.slice().sort(function (a, b) { return b.discount_pct - a.discount_pct; }).slice(0, 10);
   document.getElementById('dealGrid').innerHTML = deals.map(function (p, i) { return KD.cardHTML(p, i); }).join('');
 
-  /* Bestsellers */
+  /* Bestsellers: badge first, then top-rated to fill the row */
   var best = C.products.filter(function (p) { return p.badge === 'bestseller'; });
+  if (best.length < 4) {
+    var topRated = C.products.slice().sort(function (a, b) { return b.rating - a.rating; });
+    topRated.forEach(function (p) { if (best.length < 4 && best.indexOf(p) === -1) best.push(p); });
+  }
   document.getElementById('bestGrid').innerHTML = best.map(function (p, i) { return KD.cardHTML(p, i); }).join('');
 
   /* Search */
