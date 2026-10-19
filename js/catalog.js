@@ -7,28 +7,52 @@ window.CATALOG = {
     "name": "Kamdaam",
     "tagline": "Low Prices. Every Day."
   },
-  "categories": [
-    {
-      "banner": "banners/cat-fashion.jpg",
-      "id": "fashion",
-      "name": "Fashion",
-      "name_en": "Fashion",
-      "tagline": "Clothes, shoes & accessories — style for everyone"
-    },
-    {
-      "banner": "banners/cat-mobile.jpg",
-      "id": "mobile",
-      "name": "Mobile Accessories",
-      "name_en": "Mobile Accessories",
-      "tagline": "Earbuds, chargers, covers — everything your phone needs"
-    },
-    {
-      "banner": "banners/cat-home.jpg",
-      "id": "home",
-      "name": "Home & Kitchen",
-      "name_en": "Home & Kitchen",
-      "tagline": "Everything for the kitchen and home — at the right price"
-    }
+  "categories":   [
+      {
+          "banner": "banners/cat-fashion.jpg",
+          "id": "fashion",
+          "name": "Fashion",
+          "name_en": "Fashion",
+          "tagline": "Clothes, shoes & accessories — style for everyone"
+      },
+      {
+          "banner": "banners/cat-mobile.jpg",
+          "id": "mobile",
+          "name": "Mobile Accessories",
+          "name_en": "Mobile Accessories",
+          "tagline": "Earbuds, chargers, covers — everything your phone needs"
+      },
+      {
+          "id": "electronics",
+          "name": "Electronics",
+          "name_en": "Electronics",
+          "tagline": "Gadgets & devices — coming soon to Kamdaam",
+          "banner": "tiles/tile-electronics.png",
+          "coming_soon": true
+      },
+      {
+          "banner": "banners/cat-home.jpg",
+          "id": "home",
+          "name": "Home & Kitchen",
+          "name_en": "Home & Kitchen",
+          "tagline": "Everything for the kitchen and home — at the right price"
+      },
+      {
+          "id": "appliances",
+          "name": "Appliances",
+          "name_en": "Appliances",
+          "tagline": "Home appliances — coming soon to Kamdaam",
+          "banner": "tiles/tile-appliances.png",
+          "coming_soon": true
+      },
+      {
+          "id": "grocery",
+          "name": "Grocery",
+          "name_en": "Grocery",
+          "tagline": "Daily essentials — coming soon to Kamdaam",
+          "banner": "tiles/tile-grocery.png",
+          "coming_soon": true
+      }
   ],
   "meta": {
     "_note": "Single source of truth for the storefront website and the Android app. Both read this file; the admin panel edits it.",
