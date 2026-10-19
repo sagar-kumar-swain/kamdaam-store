@@ -13,7 +13,7 @@
   };
 
   function money(n) { return '\u20B9' + Number(n).toLocaleString('en-IN'); }
-  function imgFile(p) { return 'images/' + p.image.split('/').pop().replace(/\.png$/, '.jpg'); }
+  function imgFile(p) { return p.image; } /* v2.4: images are PNG now; use path as-is */
   function bannerFile(b) { return 'banners/' + b.split('/').pop().replace(/\.png$/, '.jpg'); }
   function waNum() { return (C.seller.whatsapp || '').replace(/\D/g, ''); }
   function brandName() { return C.brand.name; }
@@ -56,6 +56,7 @@
   }
   function badgesHTML(p) {
     if (p.badge === 'bestseller') return '<span class="badge best">BESTSELLER</span>';
+    if (p.badge === 'originals') return '<span class="badge best">ORIGINALS</span>';
     return '';
   }
   function ctaHTML(p) {
@@ -122,7 +123,55 @@
     return lines.join('\n');
   }
 
-  /* ---------- sale countdown: ticks down to local midnight ---------- */
+  /* ---------- seasonal auto-theme engine (v2.4) ----------
+     Banner/title/gradient/decor/countdown follow the date, like Flipkart/Amazon.
+     seasons.json is the single source; same file the Android app reads. */
+  var SEASON_END = null; /* Date the active season ends (countdown target) */
+  function mdOf(mmdd) { return parseInt(mmdd.slice(0, 2), 10) * 100 + parseInt(mmdd.slice(3, 5), 10); }
+  function inSeason(md, s, e) { return s <= e ? (md >= s && md <= e) : (md >= s || md <= e); }
+  function fallbackSeason() {
+    return { id: 'default', title1: 'MEGA', title2: 'FASHION SALE', sub: 'Top Brands \u2022 Best Prices',
+      ribbon: 'MIN. 50% OFF', gradient: ['#1466CC', '#3B2BBF', '#6022C3'], decor: 'sparkles',
+      hero: 'images/hero-fashion.png', start: '01-01', end: '12-31' };
+  }
+  function resolveSeason(list, now) {
+    var md = (now.getMonth() + 1) * 100 + now.getDate();
+    for (var i = 0; i < list.length; i++) {
+      var s = list[i];
+      if (s.id === 'default') continue;
+      if (inSeason(md, mdOf(s.start), mdOf(s.end))) return s;
+    }
+    for (var j = 0; j < list.length; j++) if (list[j].id === 'default') return list[j];
+    return fallbackSeason();
+  }
+  function seasonEndDate(season, now) {
+    var em = mdOf(season.end), ey = now.getFullYear();
+    if (em < (now.getMonth() + 1) * 100 + now.getDate()) ey += 1; /* wrapped season */
+    return new Date(ey, Math.floor(em / 100) - 1, em % 100, 23, 59, 59);
+  }
+  function applySeason() {
+    var now = new Date();
+    function paint(s) {
+      var hb = document.getElementById('heroBox');
+      if (hb && s.gradient && s.gradient.length >= 3)
+        hb.style.background = 'linear-gradient(135deg,' + s.gradient.join(',') + ')';
+      var t1 = document.getElementById('heroT1'); if (t1) t1.textContent = s.title1;
+      var t2 = document.getElementById('heroT2'); if (t2) t2.textContent = s.title2;
+      var sub = document.getElementById('heroSub'); if (sub) sub.textContent = s.sub;
+      var rib = document.getElementById('heroRibbon'); if (rib) rib.textContent = s.ribbon;
+      var ph = document.getElementById('heroPhoto'); if (ph && s.hero) ph.src = s.hero;
+      SEASON_END = seasonEndDate(s, now);
+      startCountdown();
+    }
+    /* fetch works on http(s); file:// falls back to the default season */
+    if (window.fetch) {
+      fetch('seasons.json').then(function (r) { return r.json(); })
+        .then(function (j) { paint(resolveSeason(j.seasons || [], now)); })
+        .catch(function () { paint(fallbackSeason()); });
+    } else paint(fallbackSeason());
+  }
+
+  /* ---------- sale countdown: ticks down to the season end ---------- */
   function startCountdown() {
     var h = document.getElementById('cdH'),
         m = document.getElementById('cdM'),
@@ -131,15 +180,14 @@
     function pad(n) { return (n < 10 ? '0' : '') + n; }
     function tick() {
       var now = new Date();
-      var end = new Date(now);
-      end.setHours(24, 0, 0, 0); /* next local midnight */
+      var end = SEASON_END || (function () { var e = new Date(now); e.setHours(24, 0, 0, 0); return e; })();
       var d = Math.max(0, Math.floor((end - now) / 1000));
       h.textContent = pad(Math.floor(d / 3600));
       m.textContent = pad(Math.floor((d % 3600) / 60));
       s.textContent = pad(d % 60);
     }
     tick();
-    setInterval(tick, 1000);
+    if (!startCountdown._t) startCountdown._t = setInterval(tick, 1000);
   }
 
   /* ---------- device-local account (no server, honest) ---------- */
@@ -250,7 +298,8 @@
     prodById: prodById, catById: catById, cardHTML: cardHTML, priceHTML: priceHTML,
     ratingHTML: ratingHTML, stepperHTML: stepperHTML, badgesHTML: badgesHTML,
     waLink: waLink, singleOrderText: singleOrderText, cartOrderText: cartOrderText,
-    headerHTML: headerHTML, footerHTML: footerHTML, esc: esc, startCountdown: startCountdown
+    headerHTML: headerHTML, footerHTML: footerHTML, esc: esc, startCountdown: startCountdown,
+    applySeason: applySeason
   };
   document.addEventListener('DOMContentLoaded', function () {
     updateBadge();
