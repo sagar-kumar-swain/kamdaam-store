@@ -175,14 +175,22 @@
   function startCountdown() {
     var h = document.getElementById('cdH'),
         m = document.getElementById('cdM'),
-        s = document.getElementById('cdS');
+        s = document.getElementById('cdS'),
+        hu = document.getElementById('cdHu');
     if (!h || !m || !s) return;
     function pad(n) { return (n < 10 ? '0' : '') + n; }
     function tick() {
       var now = new Date();
       var end = SEASON_END || (function () { var e = new Date(now); e.setHours(24, 0, 0, 0); return e; })();
       var d = Math.max(0, Math.floor((end - now) / 1000));
-      h.textContent = pad(Math.floor(d / 3600));
+      var hrs = Math.floor(d / 3600);
+      if (hrs >= 48) { /* long sale: show days, not "654 Hrs" */
+        h.textContent = Math.floor(hrs / 24);
+        if (hu) hu.textContent = 'Days';
+      } else {
+        h.textContent = pad(hrs);
+        if (hu) hu.textContent = 'Hrs';
+      }
       m.textContent = pad(Math.floor((d % 3600) / 60));
       s.textContent = pad(d % 60);
     }
