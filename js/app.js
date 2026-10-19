@@ -69,8 +69,9 @@
       '<span class="qv">' + q + '</span>' +
       '<button data-inc="' + id + '" aria-label="Increase quantity">+</button></div>';
   }
-  function cardHTML(p) {
-    return '<div class="card" data-card="' + p.id + '">' +
+  function cardHTML(p, i) {
+    var pi = (typeof i === 'number') ? (i % 6) : 0;
+    return '<div class="card pastel-' + pi + '" data-card="' + p.id + '">' +
       '<a class="card-img" href="product.html?id=' + p.id + '" aria-label="' + esc(p.name) + '">' +
       '<img src="' + imgFile(p) + '" alt="' + esc(p.name) + '" loading="lazy">' + badgesHTML(p) + '</a>' +
       '<div class="card-body"><div class="card-name">' + esc(p.name) + '</div>' +
@@ -111,14 +112,34 @@
       'Total: ' + money(total) + ' (COD/UPI)\n\n' +
       buyerBlock();
   }
-  function cartOrderText(items, totals) {
+  function cartOrderText(items, totals, payLabel) {
     var lines = ['Hello! I want to order from ' + brandName() + ':\n'];
     items.forEach(function (it, i) {
       lines.push((i + 1) + '. ' + it.p.name + '\n   ' + money(it.p.price) + ' x ' + it.q + ' = ' + money(it.p.price * it.q));
     });
     lines.push('\nTotal: ' + money(totals.total) +
-      ' (You save: ' + money(totals.savings) + ', COD/UPI)\n\n' + buyerBlock());
+      ' (You save: ' + money(totals.savings) + ', ' + (payLabel || 'COD/UPI') + ')\n\n' + buyerBlock());
     return lines.join('\n');
+  }
+
+  /* ---------- sale countdown: ticks down to local midnight ---------- */
+  function startCountdown() {
+    var h = document.getElementById('cdH'),
+        m = document.getElementById('cdM'),
+        s = document.getElementById('cdS');
+    if (!h || !m || !s) return;
+    function pad(n) { return (n < 10 ? '0' : '') + n; }
+    function tick() {
+      var now = new Date();
+      var end = new Date(now);
+      end.setHours(24, 0, 0, 0); /* next local midnight */
+      var d = Math.max(0, Math.floor((end - now) / 1000));
+      h.textContent = pad(Math.floor(d / 3600));
+      m.textContent = pad(Math.floor((d % 3600) / 60));
+      s.textContent = pad(d % 60);
+    }
+    tick();
+    setInterval(tick, 1000);
   }
 
   /* ---------- device-local account (no server, honest) ---------- */
@@ -203,7 +224,7 @@
   function headerHTML(active) {
     return '<header class="header"><div class="wrap header-inner">' +
       '<a class="logo-chip" href="index.html" aria-label="Kamdaam Home">' +
-      '<img src="img/logo-b.png" alt="Kamdaam"></a>' +
+      '<img src="img/logo-d.png" alt="Kamdaam"></a>' +
       '<div class="searchbar">' +
       '<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#8A918A" stroke-width="2" stroke-linecap="round"><circle cx="11" cy="11" r="7"/><path d="M21 21l-4.3-4.3"/></svg>' +
       '<input id="search" type="search" placeholder="Search for Products, Brands and More" aria-label="Search products"></div>' +
@@ -229,7 +250,7 @@
     prodById: prodById, catById: catById, cardHTML: cardHTML, priceHTML: priceHTML,
     ratingHTML: ratingHTML, stepperHTML: stepperHTML, badgesHTML: badgesHTML,
     waLink: waLink, singleOrderText: singleOrderText, cartOrderText: cartOrderText,
-    headerHTML: headerHTML, footerHTML: footerHTML, esc: esc
+    headerHTML: headerHTML, footerHTML: footerHTML, esc: esc, startCountdown: startCountdown
   };
   document.addEventListener('DOMContentLoaded', function () {
     updateBadge();
