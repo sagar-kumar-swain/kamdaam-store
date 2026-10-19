@@ -56,7 +56,7 @@ button{font:inherit;cursor:pointer;border:none;background:none}
 .cat-item img{width:72px;height:72px;border-radius:24px;object-fit:cover;background:transparent;
   margin:0 auto}
 .cat-item span{display:block;font-size:13px;font-weight:700;color:#fff;margin-top:6px;
-  white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+  line-height:1.25;min-height:33px;overflow-wrap:break-word}
 .cat-item:active img{transform:scale(.96)}
 
 /* ---------- Hero (Diwali Dhamaka) ---------- */
