@@ -48,8 +48,8 @@
 </main>
 <div id="footer"></div>
 
-<script src="js/catalog.js?v=2.5"></script>
-<script src="js/app.js?v=2.5"></script>
+<script src="js/catalog.js?v=2.6"></script>
+<script src="js/app.js?v=2.6"></script>
 <script>
 (function () {
   var KD = window.KD;
@@ -91,7 +91,7 @@
     return '<div class="pay-methods" role="radiogroup" aria-label="Payment method">' +
       '<div class="pm-title">Payment Method</div>' +
       '<label class="pm-option"><input type="radio" name="pay" value="cod"' + (payMethod === 'cod' ? ' checked' : '') + '> Cash on Delivery <span class="pm-sub">Pay when you receive</span></label>' +
-      '<label class="pm-option"><input type="radio" name="pay" value="upi"' + (payMethod === 'upi' ? ' checked' : '') + '> UPI <span class="pm-sub">Prepaid — pay now</span></label>' +
+      '<label class="pm-option"><input type="radio" name="pay" value="upi"' + (payMethod === 'upi' ? ' checked' : '') + '> UPI <span class="pm-sub">Prepaid — confirm on WhatsApp</span></label>' +
       '<label class="pm-option disabled"><input type="radio" name="pay" value="online" disabled> Online Payment <span class="soon-badge">Coming Soon</span></label>' +
       '</div>';
   }
